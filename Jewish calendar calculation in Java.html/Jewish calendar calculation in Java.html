@@ -1,0 +1,1040 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<!-- saved from url=(0053)http://www.david-greve.de/luach-code/jewish-java.html -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Jewish calendar calculation in Java</title>
+<link rel="stylesheet" href="./Jewish calendar calculation in Java_files/prog.css" type="text/css">
+</head>
+<body>
+
+<p class="impressum">
+<a href="http://www.david-greve.de/impressum.html">Impressum</a>
+</p>
+
+<h1 id="caption">Jewish calendar calculation in Java</h1>
+
+<p id="copyright">
+Source code <tt>Copyright © by Ulrich and David Greve (2005)</tt>
+<br>
+<span class="copyrightblue">
+The code is freely usable for non-profit purposes when
+this Copyright notice is included.
+</span>
+</p>
+
+<h2>Table Of Contents</h2>
+
+<ul>
+<li><a href="http://www.david-greve.de/luach-code/jewish-java.html#leapyear">Determining if a Jewish year is a leap year</a></li>
+<li><a href="http://www.david-greve.de/luach-code/jewish-java.html#jewishmonths">Numbering of the Jewish months, converting a Jewish month number into a string</a></li>
+<li><a href="http://www.david-greve.de/luach-code/jewish-java.html#gregoriantojewish">Converting Gregorian dates to Jewish dates</a></li>
+<li><a href="http://www.david-greve.de/luach-code/jewish-java.html#jewishtogregorian">Converting Jewish dates to Gregorian dates</a></li>
+<li><a href="http://www.david-greve.de/luach-code/jewish-java.html#weekday">Getting the weekday of a Gregorian or Jewish date</a></li>
+<li><a href="http://www.david-greve.de/luach-code/jewish-java.html#countdays">Getting the number of days in a Gregorian or Jewish month</a></li>
+<li><a href="http://www.david-greve.de/luach-code/jewish-java.html#astro">Sunrise, sunset, degrees below horizons, proportional hours</a></li>
+<li><a href="http://www.david-greve.de/luach-code/jewish-java.html#israeldst">Calculating Israeli Daylight Savings Time</a></li>
+<li><a href="http://www.david-greve.de/luach-code/jewish-java.html#holidays">Calculating Jewish holidays</a></li>
+</ul>
+
+<h2><a id="leapyear">Determining if a Jewish year is a leap year</a></h2>
+
+<p>
+The following function calculates whether a jewish year is
+a leap year or not.
+</p>
+
+<pre>public boolean hebrewLeapYear(int year) {
+  if ((((year*7)+1) % 19) &lt; 7)
+    return true;
+  else
+    return false;
+}
+</pre>
+
+<h2><a id="jewishmonths">Numbering of the Jewish months, converting a Jewish month number into a string</a></h2>
+
+<p>
+The Jewish months are numbered in the following way:
+</p>
+
+<table border="border">
+<tbody><tr><th>Name of Jewish month</th><th>Month number</th></tr>
+<tr><td>Tishri</td><td>7</td></tr>
+<tr><td>Heshvan</td><td>8</td></tr>
+<tr><td>Kislev</td><td>9</td></tr>
+<tr><td>Tevet</td><td>10</td></tr>
+<tr><td>Shevat</td><td>11</td></tr>
+<tr><td>Adar (in non-leap years), Adar I (in leap years)</td><td>12</td></tr>
+<tr><td>Adar II (in leap years), unused in non-leap years</td><td>13</td></tr>
+<tr><td>Nisan</td><td>1</td></tr>
+<tr><td>Iyar</td><td>2</td></tr>
+<tr><td>Sivan</td><td>3</td></tr>
+<tr><td>Tammuz</td><td>4</td></tr>
+<tr><td>Av</td><td>5</td></tr>
+<tr><td>Elul</td><td>6</td></tr>
+</tbody></table>
+
+<p>
+When displaying a month name string, you should distinguish between leap
+years and non-leap years in order to correctly display the month
+name of Adar. The following function <b>getJewishMonthName</b> helps:
+</p>
+
+<pre>  public static boolean hebrewLeapYear(int year) {
+    if ((((year*7)+1) % 19) &lt; 7)
+      return true;
+    else
+      return false;
+  }
+
+  public static String getJewishMonthName(int monthNumber, int year) {
+    String[] jewishMonthNamesLeap = {"Nisan", "Iyar", "Sivan", "Tammuz",
+                                "Av", "Elul", "Tishri", "Heshvan",
+                                "Kislev", "Tevet", "Shevat", "Adar I", "Adar II"};
+    String[] jewishMonthNamesNonLeap = {"Nisan", "Iyar", "Sivan", "Tammuz",
+                                "Av", "Elul", "Tishri", "Heshvan",
+                                "Kislev", "Tevet", "Shevat", "Adar"};
+
+    if(hebrewLeapYear(year)) {
+      return jewishMonthNamesLeap[monthNumber-1];
+    } else {
+      return jewishMonthNamesNonLeap[monthNumber-1];
+    }
+  }
+</pre>
+
+<p>
+Now you need following classes:
+</p>
+
+<ul>
+  <li><a href="http://www.david-greve.de/luach-code/jCalendarDate.html">CalendarDate</a></li>
+  <li><a href="http://www.david-greve.de/luach-code/jCalendarImpl.html">CalendarImpl</a></li>
+</ul>
+
+<h2><a id="gregoriantojewish">Converting Gregorian dates to Jewish dates</a></h2>
+
+<p>
+In order to convert a Gregorian date to a Jewish date, use the
+<b>CalendarImpl.absoluteFromGregorianDate</b> function to convert the Gregorian date into
+an absolute day number and the <b>CalendarImpl.jewishDateFromAbsolute</b> function to convert
+the absolute day number to a Jewish date.
+</p>
+
+<p>
+The <b>CalendarImpl.absoluteFromGregorianDate</b> function takes an object of the class
+CalendarDate of the Gregorian date and an object of the CalendarImpl class
+and returns the corresponding absolute day number.
+Then you can pass the returned absolute day number to the
+<b>CalendarImpl.jewishDateFromAbsolute</b> function which returns a CalendarDate 
+containing the Jewish month, day and year of the passed absolute day number.
+</p>
+
+<p>
+Example:
+</p>
+
+<pre>  public static CalendarDate gregorian2Jewish(CalendarDate date2Convert, CalendarImpl i) {
+    int absolute = i.absoluteFromGregorianDate(date2Convert);
+    CalendarDate dateJewish = i.jewishDateFromAbsolute(absolute);
+    return dateJewish;
+  }
+</pre>
+
+<h2><a id="jewishtogregorian">Converting Jewish dates to Gregorian dates</a></h2>
+
+<p>
+If converting a Jewish date to a Gregorian date, the function
+<b>CalendarImpl.absoluteFromJewishDate</b> with parameters month, day and year
+has to be used to convert a Jewish date into an absolute day number.
+Then, the function <b>CalendarImpl.gregorianDateFromAbsolute</b> converts the absolute day
+number into a CalendarDate which contains
+the Gregorian month, day and year of the passed absolute day number.
+</p>
+
+<p>
+Example:
+</p>
+
+<pre>  public static CalendarDate jewish2Gregorian(CalendarDate date2Convert, CalendarImpl i) {
+    int absolute = i.absoluteFromJewishDate(date2Convert);
+    CalendarDate dateGregorian = i.gregorianDateFromAbsolute(absolute);
+    return dateGregorian;
+  }
+</pre>
+
+<h2><a id="weekday">Getting the weekday of a Gregorian or Jewish date</a></h2>
+
+<p>
+Given an absolute day number, the weekday of a date can be easily
+determined by the <b>CalendarImpl.getWeekday</b> function which takes
+the absolute day number as the argument.
+</p>
+
+<p>
+0 is returned for Sunday, 1 is returned for Monday, and so on.
+</p>
+
+<pre>  public static int getWeekday(int absDate) {
+    return (absDate % 7);
+  }
+</pre>
+
+<h2><a id="countdays">Getting the number of days in a Gregorian or Jewish month</a></h2>
+
+<p>
+The function <b>CalendarImpl.getLastDayOfJewishMonth</b> takes
+a month and year and returns the last day (= number of days)
+of the passed month.
+</p>
+
+<p>
+The function <b>CalendarImpl.getLastDayOfGregorianMonth</b> takes
+a month and year, too and returns the last day (= number of days)
+of the passed month.
+</p>
+
+<h2><a id="astro">Sunrise, sunset, degrees below horizons, proportional hours</a></h2>
+
+<p>
+The class <tt>Location</tt> contains the name (it is not used in the
+calculation code), latitude, longitude, time zone and optionally the
+elevation (0 if not known) of a location.
+</p>
+
+<ul>
+<li>
+The value in the latitude and longitude must be the degrees multiplied
+with 100 and then the minutes added, e.g. latitude = latDeg * 100 + latMin.
+</li>
+<li>
+Positive latitudes are North, negative latitudes are South.
+Positive longitudes are East, negative longitudes are West.
+</li>
+<li>
+The time zone is relative to GMT, e.g. 1 means GMT+1.
+</li>
+<li>
+The elevation is in metres.
+</li>
+</ul>
+
+<p>
+The various calculation functions return the time as an object of class
+<tt>CalendarTime</tt>.
+The hour and minute can be accessed directly by the getter functions or
+formatted to a string via the <tt>formatTime12</tt> or <tt>formatTime24</tt>
+methods in 12 hour (AM/PM) or 24 hour format.
+<tt>formatTimeShaaZmanit</tt> formats a value returned by <tt>GetShaaZmanit</tt>.
+A count of minutes can be added or subtracted from the time by
+<tt>addMinutes</tt> and <tt>subtractMinutes</tt>.
+</p>
+
+<p>
+The class <tt>AstronomicalCalculations</tt> contains the following public
+methods:
+</p>
+
+<ul>
+<li><tt>GetSunrise(month, day, year, location)</tt>:
+    Returns a <tt>CalendarTime</tt> object with the sunrise of the given date and location</li>
+<li><tt>GetSunset(month, day, year, location)</tt>:
+    Returns a <tt>CalendarTime</tt> object with the sunset of the given date and location</li>
+<li><tt>GetSunriseDegreesBelowHorizon(month, day, year, degrees, location)</tt>:
+    Returns a <tt>CalendarTime</tt> object with the time of degrees below horizon before sunrise of the given date and location</li>
+<li><tt>GetSunsetDegreesBelowHorizon(month, day, year, degrees, location)</tt>:
+     Returns a <tt>CalendarTime</tt> object with the time of degrees below horizon after sunset of the given date and location</li>
+<li><tt>GetProportionalHours(value, sunrise, sunset)</tt>:
+    Returns a <tt>CalendarTime</tt> object with the time of the given proportional hours (after sunrise) of the given date and location</li>
+<li><tt>GetShaaZmanit(sunrise, sunset)</tt>: Returns the length
+    of the proportional hour (Sha'a Zmanit) in minutes.</li>
+</ul>
+
+<p>
+Here is the code:
+</p>
+
+<pre>class Location {
+  Location() {
+    name = "";
+    latitude = longitude = timeZone = elevation = 0;
+  }
+
+  Location(String name, int latitude, int longitude, int timeZone, int elevation) {
+    this.name = name;
+    this.latitude = latitude; this.longitude = longitude;
+    this.timeZone = timeZone;
+    this.elevation = elevation;
+  }
+
+  public String getName() { return name; }
+  public int getLatitude() { return latitude; }
+  public int getLongitude() { return longitude; }
+  public int getTimeZone() { return timeZone; }
+  public int getElevation() { return elevation; }
+
+  public void setName(String name) { this.name = name; }
+  public void setLatitude(int latitude) { this.latitude = latitude; }
+  public void setLongitude(int longitude) { this.longitude = longitude; }
+  public void setTimeZone(int timeZone) { this.timeZone = timeZone; }
+  public void setElevation(int elevation) { this.elevation = elevation; }
+
+  private String name;
+  private int latitude, longitude, timeZone, elevation;
+}
+
+class CalendarTime {
+  CalendarTime(int hour, int min) {
+    this.hour = hour; this.min = min;
+  }
+
+  public int getHour() { return hour; }
+  public int getMin() { return min; }
+
+  public void setHour(int hour) { this.hour = hour; }
+  public void setMin(int min) { this.min = min; }
+
+  public String formatTime12() {
+    int hourModulo12 = hour % 12;
+    if (hourModulo12 == 0)
+      hourModulo12 = 12;
+
+    String ampm;
+    if (hour &gt;= 12)
+      ampm = "PM";
+    else
+      ampm = "AM";
+
+    String hourStr, minStr;
+    if (hourModulo12 &lt; 10)
+      hourStr = "0" + Integer.toString(hourModulo12);
+    else
+      hourStr = Integer.toString(hourModulo12);
+    if (min &lt; 10)
+      minStr = "0" + Integer.toString(min);
+    else
+      minStr = Integer.toString(min);
+    return hourStr + ":" + minStr + ampm;
+  }
+
+  public String formatTime24() {
+    String hourStr, minStr;
+    if (hour &lt; 10)
+      hourStr = "0" + Integer.toString(hour);
+    else
+      hourStr = Integer.toString(hour);
+    if (min &lt; 10)
+      minStr = "0" + Integer.toString(min);
+    else
+      minStr = Integer.toString(min);
+    return hourStr + ":" + minStr;
+  }
+
+  public static String formatTimeShaaZmanit(int value) {
+    int hour = (int) (value / 60);
+    int min = value % 60;
+    String hourStr, minStr;
+    if (hour &lt; 10)
+      hourStr = "0" + Integer.toString(hour);
+    else
+      hourStr = Integer.toString(hour);
+    if (min &lt; 10)
+      minStr = "0" + Integer.toString(min);
+    else
+      minStr = Integer.toString(min);
+    return hourStr + ":" + minStr;
+  }
+
+  public void addMinutes(int min) {
+    this.min += min;
+    while (this.min &gt;= 60) {
+      this.min -= 60;
+      this.hour += 1;
+    }
+  }
+
+  public void subtractMinutes(int min) {
+    this.min -= min;
+    while (this.min &lt; 0) {
+      this.min += 60;
+      this.hour -= 1;
+    }
+  }
+
+  private int hour, min;
+}
+
+class AstronomicalCalculations {
+  private boolean leap(int y) {
+    if (y % 400 == 0)
+      return true;
+    if (y % 100 != 0) {
+      if (y % 4 == 0)
+        return true;
+    }
+    return false;
+  }
+  private int doy(int d, int m, int y) {
+    int[] monCount = {0, 1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366};
+    if ((m &gt; 2) &amp;&amp; (leap(y)))
+      return monCount[m] + d + 1;
+    else
+      return monCount[m] + d;
+  }
+  private double todec(int deg, int min) {
+    return (deg + min / 60.0);
+  }
+  private double M(double x) {
+    return (0.9856 * x - 3.251);
+  }
+  private double L(double x) {
+    return (x + 1.916 * Math.sin(0.01745 * x) + 0.02 * Math.sin(2 * 0.01745 * x) + 282.565);
+  }
+  private double adj(double x) {
+    return (-0.06571 * x - 6.620);
+  }
+  private double float_abs(double x) {
+    if (x &lt; 0.0)
+      return (-x);
+    else
+      return (x);
+  }
+  private double[] suntime(int d, int m, int y,
+            int zendeg, int zenmin,
+            int londeg, int lonmin, int ew,
+            int latdeg, int latmin, int ns,
+            int tz,
+            int elevation) { // Elevation in meters
+    if (zendeg == 90) {
+      double earthRadiusInMeters = 6356.9 * 1000.0;
+      double elevationAdjustment = Math.toDegrees
+        (Math.acos(earthRadiusInMeters / (earthRadiusInMeters + elevation)));
+
+      double z = zendeg + zenmin / 60.0;
+      z += elevationAdjustment;
+      zendeg = (int) Math.floor(z);
+      zenmin = (int) ((z - Math.floor(z)) * 60);
+    }
+
+    int day = doy(d, m, y);
+    double cosz = Math.cos(0.01745 * todec(zendeg, zenmin));
+
+    double longitude = todec(londeg, lonmin);
+    if (ew != 0)
+      longitude *= -1;
+    double lonhr     = longitude / 15.0;
+    double latitude  = todec(latdeg, latmin);
+    if (ns != 0) {
+      latitude *= -1;
+    }
+    double coslat    = Math.cos(0.01745 * latitude);
+    double sinlat    = Math.sin(0.01745 * latitude);
+
+    double t_rise = day + (6.0 + lonhr) / 24.0;
+    double t_set  = day + (18.0 + lonhr) / 24.0;
+
+    double xm_rise = M(t_rise);
+    double xl_rise = L(xm_rise);
+    double xm_set  = M(t_set);
+    double xl_set  = L(xm_set);
+  
+    double a_rise = 57.29578 * Math.atan( 0.91746 * Math.tan(0.01745 * xl_rise) );
+    double a_set  = 57.29578 * Math.atan( 0.91746 * Math.tan(0.01745 * xl_set) );
+    if (float_abs(a_rise + 360.0 - xl_rise) &gt; 90.0)
+      a_rise += 180.0;
+    if (a_rise &gt; 360.0)
+      a_rise -= 360.0;
+
+    if (float_abs(a_set + 360.0 - xl_set) &gt; 90.0)
+      a_set += 180.0;
+    if (a_set &gt; 360.0)
+      a_set -= 360.0;
+
+    double ahr_rise = a_rise / 15.0;
+    double sindec = 0.39782 * Math.sin(0.01745 * xl_rise);
+    double cosdec = Math.sqrt(1.0 - sindec * sindec);
+    double h_rise = (cosz - sindec * sinlat) / (cosdec * coslat);
+
+    double ahr_set = a_set / 15.0;
+    sindec = 0.39782 * Math.sin(0.01745 * xl_set);
+    cosdec = Math.sqrt(1.0 - sindec * sindec);
+    double h_set = (cosz - sindec * sinlat) / (cosdec * coslat);
+
+    if (float_abs(h_rise) &lt;= 1.0)
+      h_rise = 57.29578 * Math.acos(h_rise);
+    else
+      return null; // NO_SUNRISE
+
+    if (float_abs(h_set) &lt;= 1.0)
+      h_set = 57.29578 * Math.acos(h_set);
+    else
+      return null; // NO_SUNSET
+    double ut_rise  = ((360.0 - h_rise) / 15.0) + ahr_rise + adj(t_rise) + lonhr;
+    double ut_set  = (h_rise / 15.0) + ahr_set + adj(t_set) + lonhr;
+
+    double returnSunrise = ut_rise + tz;  // sunrise
+    double returnSunset = ut_set  + tz; // sunset
+    double[] result = {returnSunrise, returnSunset};
+    return result;
+  }
+  private int[] timeadj(double t) {
+    if (t &lt; 0)
+      t += 24.0;
+
+    int hour = (int)Math.floor(t);
+    int min  = (int)Math.floor((t - hour) * 60.0 + 0.5);
+
+    if (min &gt;= 60) {
+      hour += 1;
+      min  -= 60;
+    }
+
+    if (hour &gt; 24)
+      hour -= 24;
+
+    int[] result = {hour, min};
+    return result;
+  }
+
+  private int GetDegreesBelowHorizonAdd(int uMonth, int uDay, int uYear,
+				double fDegreesBelowHorizon,
+				Location location) {
+    int iLatitude = location.getLatitude();
+    int iLongitude = location.getLongitude();
+    int iTimeZone = location.getTimeZone();
+    int elevation = location.getElevation();
+
+    int longitudeFlag, latitudeFlag;
+    if (iLongitude &lt; 0) {
+      longitudeFlag = 0;
+    } else {
+      longitudeFlag = 1;
+    }
+    if (iLatitude &lt; 0) {
+      latitudeFlag = 1;
+    } else {
+      latitudeFlag = 0;
+    }
+    double[] returnTimes = suntime(uDay, uMonth, uYear,
+	      90, 50,
+	      (int)Math.floor(Math.abs(iLongitude / 100)),
+		(int)Math.floor(Math.abs(iLongitude % 100)), longitudeFlag,
+	      (int)Math.floor(Math.abs(iLatitude / 100)),
+		(int)Math.floor(Math.abs(iLatitude % 100)), latitudeFlag,
+	      iTimeZone, elevation);
+    if (returnTimes != null) {
+      int[] srTime = timeadj(returnTimes[1]);
+      while (srTime[0] &gt; 12) {
+        srTime[0] -= 12;
+      }
+
+      double db = fDegreesBelowHorizon + 90.0;
+      int deghour = (int) Math.floor(db);
+      db = db - deghour;
+      db *= 60.0;
+      int degmin = (int) Math.floor(db);
+      returnTimes = suntime(uDay, uMonth, uYear,
+		deghour, degmin,
+		(int)(Math.floor(Math.abs(iLongitude / 100))),
+		  (int)(Math.floor(Math.abs(iLongitude % 100))), longitudeFlag,
+		(int)(Math.floor(Math.abs(iLatitude / 100))),
+		  (int)(Math.floor(Math.abs(iLatitude % 100))), latitudeFlag,
+		iTimeZone, elevation);
+      if (returnTimes != null) {
+        int[] dbTime = timeadj(returnTimes[1]);
+        while (dbTime[0] &gt; 12) {
+          dbTime[0] -= 12;
+        }
+
+        int srTimeValue = srTime[0] * 60 + srTime[1];
+        int dbTimeValue = dbTime[0] * 60 + dbTime[1];
+        return dbTimeValue - srTimeValue;
+      }
+    }
+    return -1;
+  }
+  public CalendarTime GetSunrise(int uMonth, int uDay, int uYear, Location location) {
+    int iLatitude = location.getLatitude();
+    int iLongitude = location.getLongitude();
+    int iTimeZone = location.getTimeZone();
+    int elevation = location.getElevation();
+
+    int longitudeFlag, latitudeFlag;
+    if (iLongitude &lt; 0) {
+      longitudeFlag = 0;
+    } else {
+      longitudeFlag = 1;
+    }
+    if (iLatitude &lt; 0) {
+      latitudeFlag = 1;
+    } else {
+      latitudeFlag = 0;
+    }
+    double[] returnTimes = suntime(uDay, uMonth, uYear,
+	      90, 50,
+	      (int)(Math.floor(Math.abs(iLongitude / 100))),
+		(int)(Math.floor(Math.abs(iLongitude % 100))), longitudeFlag,
+	      (int)(Math.floor(Math.abs(iLatitude / 100))),
+		(int)(Math.floor(Math.abs(iLatitude % 100))), latitudeFlag,
+	      iTimeZone, elevation);
+    if (returnTimes != null) {
+      int[] returnTime = timeadj(returnTimes[0]);
+    
+      while (returnTime[0] &gt; 12) {
+        returnTime[0] -= 12;
+      }
+    
+      return new CalendarTime(returnTime[0], returnTime[1]);
+    } else {
+      return null;
+    }
+  }
+  public CalendarTime GetSunriseDegreesBelowHorizon(int uMonth, int uDay, int uYear,
+				      double fDegreesBelowHorizon,
+				      Location location) {
+    CalendarTime t = GetSunrise(uMonth, uDay, uYear, location);
+    if (t != null) {
+      int adding = GetDegreesBelowHorizonAdd(uMonth, uDay, uYear, fDegreesBelowHorizon, location);
+      if (adding != -1) {
+        t.subtractMinutes(adding);
+        return t;
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+  public CalendarTime GetSunset(int uMonth, int uDay, int uYear,
+		   Location location) {
+    int iLatitude = location.getLatitude();
+    int iLongitude = location.getLongitude();
+    int iTimeZone = location.getTimeZone();
+    int elevation = location.getElevation();
+
+    int longitudeFlag, latitudeFlag;
+    if (iLongitude &lt; 0) {
+      longitudeFlag = 0;
+    } else {
+      longitudeFlag = 1;
+    }
+    if (iLatitude &lt; 0) {
+      latitudeFlag = 1;
+    } else {
+      latitudeFlag = 0;
+    }
+
+    double[] returnTimes = suntime(uDay, uMonth, uYear,
+	      90, 50,
+	      (int)(Math.floor(Math.abs(iLongitude / 100))),
+		(int)(Math.floor(Math.abs(iLongitude % 100))), longitudeFlag,
+	      (int)(Math.floor(Math.abs(iLatitude / 100))),
+		(int)(Math.floor(Math.abs(iLatitude % 100))), latitudeFlag,
+	      iTimeZone, elevation);
+    if (returnTimes != null) {
+      int[] returnTime = timeadj(returnTimes[1]);
+
+      while (returnTime[0] &lt; 12)
+        returnTime[0] += 12;
+
+      return new CalendarTime(returnTime[0], returnTime[1]);
+    } else {
+      return null;
+    }
+  }
+
+  public CalendarTime GetSunsetDegreesBelowHorizon(int uMonth, int uDay, int uYear,
+				      double fDegreesBelowHorizon,
+				      Location location) {
+    CalendarTime t = GetSunset(uMonth, uDay, uYear, location);
+    if (t != null) {
+      int adding = GetDegreesBelowHorizonAdd(uMonth, uDay, uYear, fDegreesBelowHorizon, location);
+      if (adding != -1) {
+        t.addMinutes(adding);
+        return t;
+      } else {
+        return null;
+      }
+    } else {
+     return null;
+    }
+  }
+
+  public CalendarTime GetProportionalHours(double value, CalendarTime sunrise, CalendarTime sunset) {
+    if (sunrise == null || sunset == null)
+      return null;
+    double sr = sunrise.getHour() * 60 + sunrise.getMin();
+    double ss = sunset.getHour() * 60 + sunset.getMin();
+    double retval = sr + Math.floor(((ss-sr) * value) / 12);
+    int[] propResult = {(int)(Math.floor(retval / 60)), (int)(retval % 60)};
+    return new CalendarTime(propResult[0], propResult[1]);
+  }
+
+  public int GetShaaZmanit(CalendarTime sunrise, CalendarTime sunset) {
+    double sr = sunrise.getHour() * 60 + sunrise.getMin();
+    double ss = sunset.getHour() * 60 + sunrise.getMin();
+    return (int)(Math.floor((ss - sr) / 12));
+  }
+}
+
+// Test program for the above astronomical code
+public class test {
+  public static void main(String[] args) {
+    CalendarTime t;
+    Location loc = new Location("Pforzheim", 4854, 842, 1, 263);
+    AstronomicalCalculations a = new AstronomicalCalculations();
+    System.out.println("Pforzheim, 20/11/2005...");
+    t = a.GetSunrise(11, 20, 2005, loc);
+    System.out.println("Sunrise: " + t.formatTime24() + ", " + t.formatTime12());
+    t = a.GetSunset(11, 20, 2005, loc);
+    System.out.println("Sunset: " + t.formatTime24());
+    t.addMinutes(45);
+    System.out.println("Sunset + 45 minutes: " + t.formatTime24());
+    t = a.GetSunset(11, 20, 2005, loc);
+    t.subtractMinutes(18);
+    System.out.println("Sunset - 18 minutes: " + t.formatTime24());
+    t = a.GetSunriseDegreesBelowHorizon(11, 20, 2005, 11, loc);
+    System.out.println("Sunrise - 11° below horizon: " + t.formatTime24());
+    t = a.GetSunsetDegreesBelowHorizon(11, 20, 2005, 8.75, loc);
+    System.out.println("Sunset + 8.75° below horizon: " + t.formatTime24());
+    CalendarTime sunr = a.GetSunrise(11, 20, 2005, loc);
+    CalendarTime suns = a.GetSunset(11, 20, 2005, loc);
+    t = a.GetProportionalHours(3, sunr, suns);
+    System.out.println("Proportional hour (3): " + t.formatTime24());
+    int shaaZmanit = a.GetShaaZmanit(sunr, suns);
+    System.out.println("Sha'a Zmanit: " + CalendarTime.formatTimeShaaZmanit(shaaZmanit));
+  }
+}
+</pre>
+
+<h2><a id="israeldst">Calculating Israeli Daylight Savings Time</a></h2>
+
+<p>
+Daylight Savings Time starts in Israel on the last Friday before 2nd of April
+and ends on the Sunday between Rosh Hashana and Yom Kippur.
+The following function <b>isIsraeliDaylightSavingsTime</b> checks for a
+Gregorian date whether Daylight Savings Time in Israel is in effect on
+that day or not.
+</p>
+
+<pre>  public static boolean isIsraeliDaylightSavingsTime(CalendarDate date, CalendarImpl i) {
+    // Get Jewish year of Yom Kippur in the passed Gregorian year
+    int a = i.absoluteFromGregorianDate(new CalendarDate(31, 12, date.getYear()));
+    CalendarDate jewishCurrent = i.jewishDateFromAbsolute(a);
+
+    // Get Last Friday before 2nd of April
+    int dstBegin = i.absoluteFromGregorianDate(new CalendarDate(2, 4, date.getYear())); // 2 April
+    dstBegin--; // get the day before 2nd of April
+    while (i.getWeekday(dstBegin) != 5) // gets the weekday, 5 = Friday
+      dstBegin--; // counts to the previous day until Friday
+
+    // Get Sunday between Rosh Hashana and Yom Kippur
+    // Take the first Sunday on or after 3rd of Tishri
+    int dstEnd = i.absoluteFromJewishDate(new CalendarDate(3, 7, jewishCurrent.getYear()));
+    while (i.getWeekday(dstEnd) != 0) // gets the weekday, 0 = Sunday
+      dstEnd++; // counts to the next day until Sunday
+
+    // Check if the current date is between the start and end date ...
+    int currentDate = i.absoluteFromGregorianDate(date);
+    if (currentDate &gt;= dstBegin &amp;&amp; currentDate &lt; dstEnd)
+      return true;
+    else
+      return false;
+  }
+</pre>
+
+<h2><a id="holidays">Calculating Jewish holidays</a></h2>
+
+<p>
+A list of the holidays with their dates and remarks for calculation is
+available <a href="http://www.david-greve.de/luach-code/holidays.html">here</a>.
+</p>
+
+<p>
+The following function <b>getHolidayForDate</b> calculates
+the holidays for a gregorian date <i>gdate</i>.
+The holidays are returned in a Vector because Shabbat Hagadol and Erev Pesach
+can fall together.
+</p>
+
+<pre>  private static int getWeekdayOfHebrewDate(int hebDay, int hebMonth, int hebYear, CalendarImpl i) {
+    int absDate = i.absoluteFromJewishDate(new CalendarDate(hebDay, hebMonth, hebYear));
+    return absDate % 7;
+  }
+
+  public static Vector getHolidayForDate(CalendarDate gdate, CalendarImpl i,
+                                  boolean diaspora) {
+    int absDate = i.absoluteFromGregorianDate(gdate);
+    CalendarDate jewishDate = i.jewishDateFromAbsolute(absDate);
+    int hebDay = jewishDate.getDay();
+    int hebMonth = jewishDate.getMonth();
+    int hebYear = jewishDate.getYear();
+
+    Vector listHolidays = new Vector();
+
+    // Holidays in Nisan
+
+    int hagadolDay = 14;
+    while (getWeekdayOfHebrewDate(hagadolDay, 1, hebYear, i) != 6)
+      hagadolDay -= 1;
+    if (hebDay == hagadolDay &amp;&amp; hebMonth == 1)
+      listHolidays.addElement("Shabat Hagadol");
+
+    if (hebDay == 14 &amp;&amp; hebMonth == 1)
+      listHolidays.addElement("Erev Pesach");
+    if (hebDay == 15 &amp;&amp; hebMonth == 1)
+      listHolidays.addElement("Pesach I");
+    if (hebDay == 16 &amp;&amp; hebMonth == 1) {
+      if (diaspora) {
+        listHolidays.addElement("Pesach II");
+      } else {
+        listHolidays.addElement("Chol Hamoed");
+      }
+    }
+    if (hebDay == 17 &amp;&amp; hebMonth == 1)
+      listHolidays.addElement("Chol Hamoed");
+    if (hebDay == 18 &amp;&amp; hebMonth == 1)
+      listHolidays.addElement("Chol Hamoed");
+    if (hebDay == 19 &amp;&amp; hebMonth == 1)
+      listHolidays.addElement("Chol Hamoed");
+    if (hebDay == 20 &amp;&amp; hebMonth == 1)
+      listHolidays.addElement("Chol Hamoed");
+    if (hebDay == 21 &amp;&amp; hebMonth == 1) {
+      if (!diaspora)
+        listHolidays.addElement("Pesach VII (Yizkor)");
+      else
+        listHolidays.addElement("Pesach VII");
+    }
+    if (hebDay == 22 &amp;&amp; hebMonth == 1) {
+      if (diaspora)
+        listHolidays.addElement("Pesach VIII (Yizkor)");
+    }
+
+    // Yom Hashoah
+
+    if (getWeekdayOfHebrewDate(27, 1, hebYear, i) == 5) {
+      if (hebDay == 26 &amp;&amp; hebMonth == 1)
+        listHolidays.addElement("Yom Hashoah");
+    } else if (hebYear &gt;= 5757 &amp;&amp; getWeekdayOfHebrewDate(27, 1, hebYear, i) == 0) {
+      if (hebDay == 28 &amp;&amp; hebMonth == 1)
+        listHolidays.addElement("Yom Hashoah");
+    } else {
+      if (hebDay == 27 &amp;&amp; hebMonth == 1)
+        listHolidays.addElement("Yom Hashoah");
+    }
+
+    // Holidays in Iyar
+
+    // Yom Hazikaron
+
+    if (getWeekdayOfHebrewDate(4, 2, hebYear, i) == 5) { // If 4th of Iyar is a Thursday ...
+      if (hebDay == 2 &amp;&amp; hebMonth == 2) // ... then Yom Hazicaron is on 2th of Iyar
+        listHolidays.addElement("Yom Hazikaron");
+    } else if (getWeekdayOfHebrewDate(4, 2, hebYear, i) == 4) {
+      if (hebDay == 3 &amp;&amp; hebMonth == 2)
+          listHolidays.addElement("Yom Hazikaron");
+    } else if (hebYear &gt;= 5764 &amp;&amp; getWeekdayOfHebrewDate(4, 2, hebYear, i) == 0) {
+      if (hebDay == 5 &amp;&amp; hebMonth == 2)
+        listHolidays.addElement("Yom Hazikaron");
+    } else {
+      if (hebDay == 4 &amp;&amp; hebMonth == 2)
+        listHolidays.addElement("Yom Hazikaron");
+    }
+
+    // Yom Ha'Azmaut
+
+    if (getWeekdayOfHebrewDate(5, 2, hebYear, i) == 6) {
+      if (hebDay == 3 &amp;&amp; hebMonth == 2)
+        listHolidays.addElement("Yom Ha'Atzmaut");
+    } else if (getWeekdayOfHebrewDate(5, 2, hebYear, i) == 5) {
+      if (hebDay == 4 &amp;&amp; hebMonth == 2)
+        listHolidays.addElement("Yom Ha'Atzmaut");
+    } else if (hebYear &gt;= 5764 &amp;&amp; getWeekdayOfHebrewDate(4, 2, hebYear, i) == 0) {
+      if (hebDay == 6 &amp;&amp; hebMonth == 2)
+        listHolidays.addElement("Yom Ha'Atzmaut");
+    } else {
+      if (hebDay == 5 &amp;&amp; hebMonth == 2)
+        listHolidays.addElement("Yom Ha'Atzmaut");
+    }
+    if (hebDay == 14 &amp;&amp; hebMonth == 2)
+      listHolidays.addElement("Pesach Sheni");
+    if(hebDay == 18 &amp;&amp; hebMonth == 2)
+      listHolidays.addElement("Lag BaOmer");
+    if(hebDay == 28 &amp;&amp; hebMonth == 2)
+      listHolidays.addElement("Yom Yerushalayim");
+
+    // Holidays in Sivan
+
+    if (hebDay == 5 &amp;&amp; hebMonth == 3)
+      listHolidays.addElement("Erev Shavuot");
+    if (hebDay == 6 &amp;&amp; hebMonth == 3) {
+      if (diaspora)
+        listHolidays.addElement("Shavuot I");
+      else
+        listHolidays.addElement("Shavuot (Yizkor)");
+    }
+    if (hebDay == 7 &amp;&amp; hebMonth == 3) {
+      if (diaspora)
+        listHolidays.addElement("Shavuot II (Yizkor)");
+    }
+
+    // Holidays in Tammuz
+
+    if (getWeekdayOfHebrewDate(17, 4, hebYear, i) == 6) {
+      if (hebDay == 18 &amp;&amp; hebMonth == 4)
+        listHolidays.addElement("Fast of Tammuz");
+    } else {
+      if (hebDay == 17 &amp;&amp; hebMonth == 4)
+        listHolidays.addElement("Fast of Tammuz");
+    }
+
+    // Holidays in Av
+
+    if (getWeekdayOfHebrewDate(9, 5, hebYear, i) == 6) {
+      if (hebDay == 10 &amp;&amp; hebMonth == 5)
+        listHolidays.addElement("Fast of Av");
+    } else {
+      if (hebDay == 9 &amp;&amp; hebMonth == 5)
+        listHolidays.addElement("Fast of Av");
+    }
+    if (hebDay == 15 &amp;&amp; hebMonth == 5)
+      listHolidays.addElement("Tu B'Av");
+
+    // Holidays in Elul
+
+    if (hebDay == 29 &amp;&amp; hebMonth == 6)
+      listHolidays.addElement("Erev Rosh Hashana");
+
+    // Holidays in Tishri
+
+    if (hebDay == 1 &amp;&amp; hebMonth == 7)
+      listHolidays.addElement("Rosh Hashana I");
+    if (hebDay == 2 &amp;&amp; hebMonth == 7)
+      listHolidays.addElement("Rosh Hashana II");
+    if (getWeekdayOfHebrewDate(3, 7, hebYear, i) == 6) {
+      if (hebDay == 4 &amp;&amp; hebMonth == 7)
+        listHolidays.addElement("Tzom Gedaliah");
+    } else {
+      if (hebDay == 3 &amp;&amp; hebMonth == 7)
+        listHolidays.addElement("Tzom Gedaliah");
+    }
+    if (hebDay == 9 &amp;&amp; hebMonth == 7)
+      listHolidays.addElement("Erev Yom Kippur");
+    if (hebDay == 10 &amp;&amp; hebMonth == 7)
+      listHolidays.addElement("Yom Kippur (Yizkor)");
+    if (hebDay == 14 &amp;&amp; hebMonth == 7)
+      listHolidays.addElement("Erev Sukkot");
+    if (hebDay == 15 &amp;&amp; hebMonth == 7) {
+      if (diaspora)
+        listHolidays.addElement("Sukkot I");
+      else
+        listHolidays.addElement("Sukkot");
+    }
+    if (hebDay == 16 &amp;&amp; hebMonth == 7) {
+      if (diaspora)
+        listHolidays.addElement("Sukkot II");
+      else
+        listHolidays.addElement("Chol Hamoed");
+    }
+    if (hebDay == 17 &amp;&amp; hebMonth == 7)
+      listHolidays.addElement("Chol Hamoed");
+    if (hebDay == 18 &amp;&amp; hebMonth == 7)
+      listHolidays.addElement("Chol Hamoed");
+    if (hebDay == 19 &amp;&amp; hebMonth == 7)
+      listHolidays.addElement("Chol Hamoed");
+    if (hebDay == 20 &amp;&amp; hebMonth == 7)
+      listHolidays.addElement("Chol Hamoed");
+    if (hebDay == 21 &amp;&amp; hebMonth == 7)
+      listHolidays.addElement("Hoshana Raba");
+    if (hebDay == 22 &amp;&amp; hebMonth == 7) {
+      if (!diaspora) {
+        listHolidays.addElement("Shemini Atzereth (Yizkor)");
+        listHolidays.addElement("Simchat Torah");
+      } else {
+        listHolidays.addElement("Shemini Atzereth (Yizkor)");
+      }
+    }
+    if (hebDay == 23 &amp;&amp; hebMonth == 7) {
+      if (diaspora)
+        listHolidays.addElement("Simchat Torah");
+    }
+
+    // Holidays in Kislev
+
+    if (hebDay == 25 &amp;&amp; hebMonth == 9)
+      listHolidays.addElement("Chanukka I");
+    if (hebDay == 26 &amp;&amp; hebMonth == 9)
+      listHolidays.addElement("Chanukka II");
+    if (hebDay == 27 &amp;&amp; hebMonth == 9)
+      listHolidays.addElement("Chanukka III");
+    if (hebDay == 28 &amp;&amp; hebMonth == 9)
+      listHolidays.addElement("Chanukka IV");
+    if (hebDay == 29 &amp;&amp; hebMonth == 9)
+      listHolidays.addElement("Chanukka V");
+
+    // Holidays in Tevet
+
+    if (hebDay == 10 &amp;&amp; hebMonth == 10)
+      listHolidays.addElement("Fast of Tevet");
+
+    if (i.getLastDayOfJewishMonth(9, hebYear) == 30) {
+      if (hebDay == 30 &amp;&amp; hebMonth == 9)
+        listHolidays.addElement("Chanukka VI");
+      if (hebDay == 1 &amp;&amp; hebMonth == 10)
+        listHolidays.addElement("Chanukka VII");
+      if (hebDay == 2 &amp;&amp; hebMonth == 10)
+        listHolidays.addElement("Chanukka VIII");
+    }
+    if (i.getLastDayOfJewishMonth(9, hebYear) == 29) {
+      if (hebDay == 1 &amp;&amp; hebMonth == 10)
+        listHolidays.addElement("Chanukka VI");
+      if (hebDay == 2 &amp;&amp; hebMonth == 10)
+        listHolidays.addElement("Chanukka VII");
+      if (hebDay == 3 &amp;&amp; hebMonth == 10)
+        listHolidays.addElement("Chanukka VIII");
+    }
+
+    // Holidays in Shevat
+
+    if (hebDay == 15 &amp;&amp; hebMonth == 11)
+      listHolidays.addElement("Tu B'Shevat");
+
+    // Holidays in Adar (I)/Adar II
+
+    int monthEsther;
+    if (i.hebrewLeapYear(hebYear))
+      monthEsther = 13;
+    else
+      monthEsther = 12;
+    
+    if (getWeekdayOfHebrewDate(13, monthEsther, hebYear, i) == 6) {
+      if (hebDay == 11 &amp;&amp; hebMonth == monthEsther)
+        listHolidays.addElement("Fast of Esther");
+    } else {
+      if (hebDay == 13 &amp;&amp; hebMonth == monthEsther)
+        listHolidays.addElement("Fast of Esther");
+    }
+
+    if (hebDay == 14 &amp;&amp; hebMonth == monthEsther)
+      listHolidays.addElement("Purim");
+    if (hebDay == 15 &amp;&amp; hebMonth == monthEsther)
+      listHolidays.addElement("Shushan Purim");
+
+    if (i.hebrewLeapYear(hebYear)) {
+      if (hebDay == 14 &amp;&amp; hebMonth == 12)
+        listHolidays.addElement("Purim Katan");
+      if (hebDay == 15 &amp;&amp; hebMonth == 12)
+        listHolidays.addElement("Shushan Purim Katan");
+    }
+    return listHolidays;
+  }
+</pre>
+
+<hr>
+
+<p>
+    <a href="http://validator.w3.org/check?uri=referer"><img src="./Jewish calendar calculation in Java_files/valid-xhtml11" alt="Valid XHTML 1.1" height="31" width="88"></a>
+</p>
+
+
+
+</body></html>

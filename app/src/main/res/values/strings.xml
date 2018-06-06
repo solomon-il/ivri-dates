@@ -1,0 +1,101 @@
+<resources>
+    <string name="app_name">Google Calendar API Android Ivri-Date</string>
+
+    <string-array name="month_array">
+        <item>חודש</item>
+        <item>תשרי</item>
+        <item>חשוון</item>
+        <item>כסלו</item>
+        <item>טבת</item>
+        <item>שבט</item>
+        <item>אדר</item>
+        <item>אדר ב&apos;</item>
+        <item>ניסן</item>
+        <item>אייר</item>
+        <item>סיון</item>
+        <item>תמוז</item>
+        <item>אב</item>
+        <item>אלול</item>
+    </string-array>
+
+    <string-array name="day_array30">
+        <item>יום</item>
+        <item>א&apos;</item>
+        <item>ב&apos;</item>
+        <item>ג&apos;</item>
+        <item>ד&apos;</item>
+        <item>ה&apos;</item>
+        <item>ו&apos;</item>
+        <item>ז&apos;</item>
+        <item>ח&apos;</item>
+        <item>ט&apos;</item>
+        <item>י&apos;</item>
+        <item>י&quot;א</item>
+        <item>י&quot;ב</item>
+        <item>י&quot;ג</item>
+        <item>י&quot;ד</item>
+        <item>ט&quot;ו</item>
+        <item>ט&quot;ז</item>
+        <item>י&quot;ז</item>
+        <item>י&quot;ח</item>
+        <item>י&quot;ט</item>
+        <item>כ&apos;</item>
+        <item>כ&quot;א</item>
+        <item>כ&quot;ב</item>
+        <item>כ&quot;ג</item>
+        <item>כ&quot;ד</item>
+        <item>כ&quot;ה</item>
+        <item>כ&quot;ו</item>
+        <item>כ&quot;ז</item>
+        <item>כ&quot;ח</item>
+        <item>כ&quot;ט</item>
+        <item>ל&apos;</item>
+    </string-array>
+
+    <string-array name="day_array29">
+        <item>יום</item>
+        <item>א&apos;</item>
+        <item>ב&apos;</item>
+        <item>ג&apos;</item>
+        <item>ד&apos;</item>
+        <item>ה&apos;</item>
+        <item>ו&apos;</item>
+        <item>ז&apos;</item>
+        <item>ח&apos;</item>
+        <item>ט&apos;</item>
+        <item>י&apos;</item>
+        <item>י&quot;א</item>
+        <item>י&quot;ב</item>
+        <item>י&quot;ג</item>
+        <item>י&quot;ד</item>
+        <item>ט&quot;ו</item>
+        <item>ט&quot;ז</item>
+        <item>י&quot;ז</item>
+        <item>י&quot;ח</item>
+        <item>י&quot;ט</item>
+        <item>כ&apos;</item>
+        <item>כ&quot;א</item>
+        <item>כ&quot;ב</item>
+        <item>כ&quot;ג</item>
+        <item>כ&quot;ד</item>
+        <item>כ&quot;ה</item>
+        <item>כ&quot;ו</item>
+        <item>כ&quot;ז</item>
+        <item>כ&quot;ח</item>
+        <item>כ&quot;ט</item>
+    </string-array>
+
+    <string-array name="day_array0">
+        <item>יום</item>
+    </string-array>
+
+    <string-array name="years">
+        <item>100</item>
+        <item>50</item>
+        <item>25</item>
+        <item>10</item>
+        <item>5</item>
+        <item>2</item>
+        <item>1</item>
+    </string-array>
+</resources>

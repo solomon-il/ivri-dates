@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="15dp"
+    android:gravity="end"
+    tools:context="com.shlominet.ivridate.MainActivity">
+
+    <TextView
+        android:textSize="28sp"
+        android:text="הכנסת אירוע בתאריך עברי"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layoutDirection="rtl"
+        android:gravity="right"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Spinner
+            android:id="@+id/month_spinner"
+            android:entries="@array/month_array"
+            android:layout_margin="15dp"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"></Spinner>
+        <Spinner
+            android:id="@+id/day_spinner"
+            android:layout_margin="15dp"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"></Spinner>
+
+    </LinearLayout>
+
+    <TextView
+        android:textSize="28sp"
+        android:text="פרטי האירוע"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <EditText
+        android:id="@+id/event_details_et"
+        android:gravity="start"
+        android:hint="חובה לרשום מספר מילים על האירוע"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layoutDirection="rtl"
+        android:gravity="right"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_marginTop="15dp"
+            android:layoutDirection="rtl"
+            android:text="לכמה שנים קדימה יישמר ביומן "
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <Spinner
+            android:id="@+id/years_spinner"
+            android:entries="@array/years"
+            android:layout_margin="15dp"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"></Spinner>
+    </LinearLayout>
+    <Button
+        android:layout_margin="25dp"
+        android:layout_gravity="center"
+        android:text="Call Google Calendar API"
+        android:id="@+id/call_api_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    
+    <TextView
+        android:gravity="start"
+        android:text="כאן יופיעו הרשומות שהוכנסו ליומן"
+        android:padding="15dp"
+        android:id="@+id/output_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

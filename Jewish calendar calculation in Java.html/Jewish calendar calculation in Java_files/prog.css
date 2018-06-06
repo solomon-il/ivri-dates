@@ -1,0 +1,9 @@
+#caption { text-align: center; }
+#copyright { text-align: center; }
+.copyrightblue { color: blue; }
+
+.impressum
+{
+  text-align: right;
+  margin-bottom: -20pt;
+}
